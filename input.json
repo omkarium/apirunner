@@ -1,4 +1,9 @@
 {
-"Call_Count": 100,
-"Url": "https://api.coinstats.app/public/v1/coins/dogecoin"
+"iterate_times": 1000,
+"url": "https://reqres.in/api/users/2",
+"method": "GET",
+"headers": {
+	"HOST": "localhost",
+	"CONTENT_TYPE": "plain/text"
+}
 }
