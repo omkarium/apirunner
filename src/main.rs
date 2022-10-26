@@ -8,25 +8,27 @@
 /* Copyright 2021 Omkaram Venkatesh */
 
 /**
- * This is a bulk API caller CLI program written in Rust. You can only make GET calls via this program for now.
+ * This is a bulk API caller CLI program written in Rust. You can only make any Method call via this program for now.
  * To use the program go through the README.md file. Please use this for legitimate interests only.
  * 
 **/
 
-extern crate colour;
+use colour;
 use reqwest;
 use std::error::Error;
 use std::fs;
 use std::env;
 
-mod sequential; 
+
+mod sequential; mod common;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct RequestDetail {
     iterate_times: u64,
     method: String,
     url: String,
-    headers: serde_json::Value
+    headers: serde_json::Value,
+    body: serde_json::Value
 }
 
 fn main() {
@@ -45,17 +47,20 @@ fn main() {
     println!("\nStarting the program ...");
 
     println!("\n{:#?}", &json);
-
+    common::pause();
     println!("\n===========================================================");
-    println!("\nInitiating the GET (only) API calls for {} times. Ctrl + C to break!!!\n", json.iterate_times);
+    println!("\nInitiating the API calls for {} times. Ctrl + C to break!!!\n", json.iterate_times);
     
     match mode.as_str() {
-        "seq"  => for i in 1..json.iterate_times{
-            let result = tokio_rt.block_on(sequential::call_api(&client, &json));
-            match result {
-                Ok(_) => println!("{:?} (✅) Made the request: {} for => {}", colour::green!("Ok"), i, &json.url),
-                Err(e) => println!("{:?} (❎) Request: {} failed with {}", colour::red!("Error"), i, e)
-            }    
+        "seq"  => {
+            let headers = sequential::header_builder(&json);
+            for i in 1..json.iterate_times{
+                let result = tokio_rt.block_on(sequential::call_api(&client, &json, headers.clone()));
+                match result {
+                    Ok(_) => println!("{:?} (✅) Made the request: {} for => {}", colour::green!("Ok"), i, &json.url),
+                    Err(e) => println!("{:?} (❎) Request: {} failed with {}", colour::red!("Error"), i, e)
+                }    
+            }
         },
         _ => ()
     }

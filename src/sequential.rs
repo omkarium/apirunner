@@ -12,15 +12,17 @@
 use std::str::FromStr;
 use crate::RequestDetail;
 use crate::Error;
+use crate::reqwest::header as header;
 
 // This is the function which makes the actual api calls. It takes the New Reqwest Object as arg0, Request Details as arg1
 // It also waits for the API response, but it passes the () to the Request
 // Instead of adding one header at a time, its better to add bunch of headers using .headers method of Client
-pub async fn call_api(client: &reqwest::Client, rd: &RequestDetail) -> Result<(), Box<dyn Error>> {
+pub async fn call_api(client: &reqwest::Client, rd: &RequestDetail, hd: header::HeaderMap) -> Result<(), Box<dyn Error>> {
     
     client
-       .get(&rd.url)
-       .headers(header_builder(&rd))
+       .request(Method::from_str(&rd.method).unwrap(), &rd.url)
+       .body(rd.body.to_string())
+       .headers(hd)
        //.header("Accept-Charset", rd.Accept_Charset.clone().unwrap_or("None".to_string())) //These work too!
        //.header("Content-Type", rd.Content_Type.clone().unwrap_or("None".to_string()))
        //.header("Accept-Encoding", rd.Accept_Encoding.clone().unwrap_or("None".to_string()))
@@ -30,13 +32,13 @@ pub async fn call_api(client: &reqwest::Client, rd: &RequestDetail) -> Result<()
        Ok(())
 }
 
-use crate::reqwest::header as header;
+use reqwest::Method;
 //use crate::reqwest::header::{*};
 use serde_json::value::Value;
 
 // This function takes the Request Details, gets the headers associated with it, loop through each one of them
 // and into HeaderMap. This Result is passed to the .headersm method declared in the call_api function.
-fn header_builder(rd: &RequestDetail) -> header::HeaderMap {
+pub fn header_builder(rd: &RequestDetail) -> header::HeaderMap {
 
     let mut map = header::HeaderMap::new();
     for i in rd.headers.as_object() {
