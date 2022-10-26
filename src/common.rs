@@ -1,5 +1,5 @@
-use std::io;
-use std::io::prelude::*;
+use std::io::{Write, Read, self};
+use chrono::{Local, format};
 
 pub fn pause() {
     let mut stdin = io::stdin();
@@ -11,4 +11,10 @@ pub fn pause() {
 
     // Read a single byte and discard
     let _ = stdin.read(&mut [0u8]).unwrap();
+}
+
+// Gives you local date time
+pub fn local_dt() -> format::DelayedFormat<format::StrftimeItems<'static>> {
+    let date = Local::now();
+    date.format("%Y-%m-%dT%H:%M:%S")
 }

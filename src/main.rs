@@ -32,7 +32,6 @@ pub struct RequestDetail {
 }
 
 fn main() {
-
     let args: Vec<String> = env::args().collect();
     let data = fs::read_to_string(&args[1]).expect("Unable to read file");
     let mode = &args[2];
@@ -57,8 +56,8 @@ fn main() {
             for i in 1..json.iterate_times{
                 let result = tokio_rt.block_on(sequential::call_api(&client, &json, headers.clone()));
                 match result {
-                    Ok(_) => println!("{:?} (✅) Made the request: {} for => {}", colour::green!("Ok"), i, &json.url),
-                    Err(e) => println!("{:?} (❎) Request: {} failed with {}", colour::red!("Error"), i, e)
+                    Ok(_) => println!("{:?} (✅) - {} - Made the request: {} for => {}", colour::green!("Ok"), common::local_dt(), i, &json.url),
+                    Err(e) => println!("{:?} (❎) - {} - Request: {} failed with {}", colour::red!("Error"), common::local_dt(), i, e)
                 }    
             }
         },
