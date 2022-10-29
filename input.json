@@ -1,11 +1,9 @@
 {
-"iterate_times": 1000,
+"iterate_times": 100,
+"parallel_request_response_wait_time": 20,
 "url": "https://reqres.in/api/users",
 "method": "POST",
-"headers": {
-	"HOST": "localhost",
-	"CONTENT_TYPE": "plain/text"
-},
+"headers": {},
 "body": {
     "name": "morpheus",
     "job": "leader"

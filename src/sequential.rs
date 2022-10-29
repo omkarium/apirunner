@@ -13,6 +13,7 @@ use std::str::FromStr;
 use crate::RequestDetail;
 use crate::Error;
 use crate::reqwest::header as header;
+use reqwest::Method;
 
 // This is the function which makes the actual api calls. It takes the New Reqwest Object as arg0, Request Details as arg1
 // It also waits for the API response, but it passes the () to the Request
@@ -31,31 +32,6 @@ pub async fn call_api(client: &reqwest::Client, rd: &RequestDetail, hd: header::
        Ok(())
 }
 
-use reqwest::Method;
-//use crate::reqwest::header::{*};
-use serde_json::value::Value;
-
-// This function takes the Request Details, gets the headers associated with it, loop through each one of them
-// and into HeaderMap. This Result is passed to the .headersm method declared in the call_api function.
-pub fn header_builder(rd: &RequestDetail) -> header::HeaderMap {
-    
-    let mut map = header::HeaderMap::new();
-    for i in rd.headers.as_object() {
-        for ele in i {
-            map.insert(header::HeaderName::from_str(ele.0).unwrap(), header::HeaderValue::from_str(match ele.1 {
-                Value::String(o) => o,
-                _ => "null"
-            }).unwrap());
-        }
-
-    }
-    //map.insert(HOST, header::HeaderValue::from_str(option_unwrapper_to_str(&rd.Accept)).unwrap());
-    //map.insert(CONTENT_LENGTH, header::HeaderValue::from_str(option_unwrapper_to_str(&rd.Content_Type)).unwrap());
-    //map.insert(ACCEPT_CHARSET, header::HeaderValue::from_str(option_unwrapper_to_str(&rd.Accept_Charset)).unwrap());
-
-    map
-}
-
 /* This works too in relation to the above commented lines
 fn option_unwrapper_to_str(arg: &Option<String>) -> &str{
     let null = "null";
@@ -65,3 +41,31 @@ fn option_unwrapper_to_str(arg: &Option<String>) -> &str{
     }
 }
 */
+
+use std::sync::atomic::Ordering;
+use crate::common;
+use std::time::Instant;
+use crate::common::header_builder;
+use tokio::runtime::Runtime;
+
+#[tokio::main]
+pub async fn start(json: &RequestDetail, client: &reqwest::Client, tokio_rt: &Runtime) -> Option<std::time::Duration> {
+    let headers = header_builder(&json);
+    let start_time = Instant::now();
+
+    for i in 1..=json.iterate_times{
+        let result = &tokio_rt.block_on(call_api(&client, &json, headers.clone()));
+        match result {
+            Ok(_) => {
+                crate::GLOBAL_SUCCESS_COUNT.fetch_max(i as usize, Ordering::SeqCst);
+                println!("{:?} (✅) - {} - Made the request: {} for => {}", colour::green!("Ok"), common::local_dt(), i, &json.url)
+            },
+            Err(e) => {
+                crate::GLOBAL_FAILED_COUNT.fetch_max(i as usize, Ordering::SeqCst);
+                println!("{:?} (❎) - {} - Request: {} failed with {}", colour::red!("Error"), common::local_dt(), i, e)
+            }
+        }    
+    }
+    Some(start_time.elapsed())
+
+}
