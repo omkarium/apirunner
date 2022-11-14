@@ -51,3 +51,62 @@ pub fn pause() {
     // Read a single byte and discard
     let _ = stdin.read(&mut [0u8]).unwrap();
 }
+/* 
+pub mod awssign {
+    use rusoto_signature::{region,signature};
+    use crate::RequestDetail;
+    use std::str::FromStr;
+    use bytes::Bytes;
+    use std::collections::BTreeMap;
+    use crate::reqwest::header as header;
+    use serde_json::value::Value;
+
+    struct SignGenerate {
+        region: region::Region,
+        payload: signature::SignedRequestPayload
+    }
+
+    pub fn generate(rd: &RequestDetail) {
+
+        let a = SignGenerate { 
+            region: region::Region::from_str(rd.aws.region.as_str()).unwrap(), 
+            payload: signature::SignedRequestPayload::Buffer(Bytes::from(rd.body.to_string()))
+        };
+
+        let b = signature::SignedRequest {
+                                method: rd.method,
+                                service: rd.aws.service,
+                                region: region::Region::from_str(rd.aws.region.as_str()).unwrap(),
+                                path: rd.aws.path,
+                                headers: header_builder(rd),
+                                params: Params,
+                                scheme: Option<String>,
+                                hostname: Option<String>,
+                                payload: Option<SignedRequestPayload>,
+                                canonical_query_string: String,
+                                canonical_uri: String,
+        };
+
+    }
+
+    pub fn header_builder(rd: &RequestDetail) -> BTreeMap<String, Vec<Vec<u8>>> {
+    let mut btreeheaders = BTreeMap::new();
+
+        for i in rd.headers.as_object() {
+            for ele in i {
+                btreeheaders.insert(header::HeaderName::from_str(ele.0).unwrap(), header::HeaderValue::from_str(match ele.1 {
+                    Value::String(o) => o,
+                    _ => "null"
+                }).unwrap());
+            }
+    
+        }
+        btreeheaders
+    }
+
+    pub fn sign() {
+        let a = signature::SignedRequest::sign(&mut self, creds);
+    }
+
+}
+*/

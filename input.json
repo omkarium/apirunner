@@ -1,11 +1,23 @@
 {
-"iterate_times": 100,
-"parallel_request_response_wait_time": 20,
+"iterate_times": 10,
+"parallel_request_response_wait_time": 50,
 "url": "https://reqres.in/api/users",
 "method": "POST",
-"headers": {},
+"headers": {
+	
+},
 "body": {
     "name": "morpheus",
     "job": "leader"
+},
+"aws_details": {
+	"action": "send",
+	"region": "us-east-2",
+	"access_key": "optional",
+    "secret_key": "optional",
+    "service": "sqs",
+    "path": "optional",
+	"max_receive_messages": 10,
+	"url": "https://sqs.us-east-2.amazonaws.com"
 }
 }

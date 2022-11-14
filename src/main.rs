@@ -14,16 +14,16 @@
 **/
 
 use reqwest;
-use std::error::Error;
-use std::fs;
-use std::env;
-use std::sync::atomic::AtomicUsize;
+use std::{
+    error::Error, fs, env, sync::atomic::AtomicUsize
+};
+
 
 
 static GLOBAL_SUCCESS_COUNT: AtomicUsize = AtomicUsize::new(0);
 static GLOBAL_FAILED_COUNT: AtomicUsize = AtomicUsize::new(0);
 
-mod sequential; mod common; mod parallel;
+mod sequential; mod common; mod parallel; mod sqs;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct RequestDetail {
@@ -32,7 +32,21 @@ pub struct RequestDetail {
     url: String,
     headers: serde_json::Value,
     body: serde_json::Value,
-    parallel_request_response_wait_time: u128
+    parallel_request_response_wait_time: u128,
+    aws_details: AwsValues 
+
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+struct AwsValues {
+    action: String,
+    region: String,
+    access_key: String,
+    secret_key: String,
+    service: String,
+    path: String,
+    url: String,
+    max_receive_messages: i64
 }
 
 fn main() {
@@ -56,6 +70,7 @@ fn main() {
     let elapsed = match mode.as_str() {
         "seq"  => sequential::start(&json, &client, &tokio_rt),
         "par" => parallel::start(&json, &client),
+        "sqs" => sqs::start(&json),
         _ => None
     };
     println!("\n============Results==============\n");
