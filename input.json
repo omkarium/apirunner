@@ -1,6 +1,6 @@
 {
-"iterate_times": 10,
-"parallel_request_response_wait_time": 50,
+"iterate_times": 500,
+"parallel_request_response_wait_time": 25,
 "url": "https://reqres.in/api/users",
 "method": "POST",
 "headers": {

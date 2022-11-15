@@ -66,11 +66,11 @@ pub async fn start(json: &RequestDetail, client: &reqwest::Client) -> Option<std
                     match res.await {
                         Ok(o) => { 
                             crate::GLOBAL_SUCCESS_COUNT.fetch_max(i as usize, Ordering::SeqCst);
-                            println!("{:?} (✅) - {} - Made the request: {} for => {:?}","Ok", common::local_dt(), i, o);
+                            println!("{:?} (✅) - {} - Made the request: {} for => {:?}\n","Ok", common::local_dt(), i, o);
                         },
                         Err(e) => {
                             crate::GLOBAL_FAILED_COUNT.fetch_max(i as usize, Ordering::SeqCst);
-                            println!("{:?} (❎) - {} - Request: {} failed with {:?}", "Error", common::local_dt(), i, e);
+                            println!("{:?} (❎) - {} - Request: {} failed with {:?}\n", "Error", common::local_dt(), i, e);
                         }
                     }
                 },

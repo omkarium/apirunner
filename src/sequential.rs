@@ -46,23 +46,22 @@ use std::sync::atomic::Ordering;
 use crate::common;
 use std::time::Instant;
 use crate::common::header_builder;
-use tokio::runtime::Runtime;
 
 #[tokio::main]
-pub async fn start(json: &RequestDetail, client: &reqwest::Client, tokio_rt: &Runtime) -> Option<std::time::Duration> {
+pub async fn start(json: &RequestDetail, client: &reqwest::Client) -> Option<std::time::Duration> {
     let headers = header_builder(&json);
     let start_time = Instant::now();
 
     for i in 1..=json.iterate_times{
-        let result = &tokio_rt.block_on(call_api(&client, &json, headers.clone()));
-        match result {
+        let result = call_api(&client, &json, headers.clone());
+        match result.await {
             Ok(_) => {
                 crate::GLOBAL_SUCCESS_COUNT.fetch_max(i as usize, Ordering::SeqCst);
-                println!("{:?} (✅) - {} - Made the request: {} for => {}", colour::green!("Ok"), common::local_dt(), i, &json.url)
+                println!("{:?} (✅) - {} - Made the request: {} for => {}\n", colour::green!("Ok"), common::local_dt(), i, &json.url)
             },
             Err(e) => {
                 crate::GLOBAL_FAILED_COUNT.fetch_max(i as usize, Ordering::SeqCst);
-                println!("{:?} (❎) - {} - Request: {} failed with {}", colour::red!("Error"), common::local_dt(), i, e)
+                println!("{:?} (❎) - {} - Request: {} failed with {}\n", colour::red!("Error"), common::local_dt(), i, e)
             }
         }    
     }

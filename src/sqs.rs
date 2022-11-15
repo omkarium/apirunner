@@ -93,7 +93,7 @@ for i in 1..=rc_json.iterate_times {
                     Err(e) => {
                         // Increment the failure counter
                         crate::GLOBAL_FAILED_COUNT.fetch_max(i as usize, Ordering::SeqCst);
-                        println!("{:?} (❎) - {} - Request: {} failed with {:?}", "Error", common::local_dt(), i, e);
+                        println!("{:?} (❎) - {} - Request: {} failed with {:?}\n", "Error", common::local_dt(), i, e);
                     }
                 }
             },
@@ -178,14 +178,14 @@ fn printer(c: &str, i: u64, o: Box<dyn Omkar>) {
         "send" => {
             // This prints only one message_id per request made. The Vec wrapper is a compromise for creating a trait.
             for itr in o.get().unwrap_or(vec![]){
-                println!("{:?} (✅) - {} - Made the request: {} for => {:?}","Ok", common::local_dt(), i, itr.message_id.unwrap_or("Null".to_string()))
+                println!("{:?} (✅) - {} - Made the request: {} for => {:?}\n","Ok", common::local_dt(), i, itr.message_id.unwrap_or("Null".to_string()))
             }
         },
         "receive" => {
             // Prints the body of each individual message for a batch of messages which comes for a single request.
             // The max number of messages is not gauranteed.
             for itr in o.get().unwrap_or(vec![]){
-                println!("{:?} (✅) - {} - Received data for the request: {} body => {:?}","Ok", common::local_dt(), i, itr.body.unwrap_or("Null".to_string()))
+                println!("{:?} (✅) - {} - Received data for the request: {} body => {:?}\n","Ok", common::local_dt(), i, itr.body.unwrap_or("Null".to_string()))
             }
         }
         _  => unimplemented!()

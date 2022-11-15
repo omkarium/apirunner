@@ -55,7 +55,6 @@ fn main() {
     let mode = &args[2];
     let json: RequestDetail = serde_json::from_str(&data[..]).expect("JSON was not well-formatted");
     let client = reqwest::Client::new();
-    let tokio_rt = tokio::runtime::Runtime::new().unwrap();
 
     println!("\nWelcome to APIRUNNER.");
     println!("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -68,7 +67,7 @@ fn main() {
     println!("\n===========================================================");
     println!("\nInitiating the API calls for {} times. Ctrl + C to break!!!\n", json.iterate_times);
     let elapsed = match mode.as_str() {
-        "seq"  => sequential::start(&json, &client, &tokio_rt),
+        "seq"  => sequential::start(&json, &client),
         "par" => parallel::start(&json, &client),
         "sqs" => sqs::start(&json),
         _ => None
